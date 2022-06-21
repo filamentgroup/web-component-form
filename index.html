@@ -80,14 +80,14 @@
         </button>
         
         <div class="button" role="button" tabindex="0" id="requestFn">
-          <span>Fires <code>requestSubmit()</code></span>
+          <span>Calls <code>requestSubmit()</code></span>
           <span class="fineprint">Except in Safari &le;15</span>
         </div>
       </div>
 
-      <p>Submits, won't validate:</p>
+      <p>Doesn't fire submit, just sends data:</p>
       <div class="button" role="button" tabindex="0" id="submitFn">
-        <span>Fires <code>submit()</code></span>
+        <span>Calls <code>submit()</code></span>
       </div>
     </form>
 
@@ -113,6 +113,8 @@
 
       // Validate fields & create FormData object
       simpleForm.addEventListener("submit", (e) => {
+        alert("submit fired");
+
         // pause to allow validation
         e.preventDefault();
 
@@ -144,6 +146,10 @@
           feedback.innerHTML = `<h3>Form values:</h3>` + feedbackArr.join(", ");
         }
       });
+
+      simpleForm.addEventListener("formdata", () => {
+        alert("formdata fired");
+      })
     </script>
   </body>
 </html>
