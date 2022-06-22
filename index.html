@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CSS experiments</title>
+    <title>Filament Group: Web component form example</title>
     <style>
       * {
         box-sizing: border-box;
@@ -14,16 +14,24 @@
         font-family: sans-serif;
         margin: 0 8vw;
       }
-      h1, h2, h3 {
+      h1,
+      h2,
+      h3 {
         margin: 1.5em 0 1em;
       }
       code {
-        font-family: "Courier New", Courier, monospace;
+        font-family: 'Courier New', Courier, monospace;
         font-weight: bold;
       }
-      p {
-        font-size: .9rem;
-        margin: 1.2rem 0 .3rem;
+      p, li {
+        font-size: 0.9rem;
+        margin: 1.2rem 0 0.3rem;
+      }
+      ul {
+        margin: .5rem 0 1rem;
+      }
+      li {
+        margin: 0 0 .5rem;
       }
       simple-input,
       simple-select {
@@ -51,17 +59,39 @@
       }
       .inline-buttons {
         display: flex;
-        gap: 1rem;  
+        gap: 1rem;
       }
       .fineprint {
-        font-size: .8em;
-        margin: .2em 0 0;
-        opacity: .6;
+        font-size: 0.8em;
+        margin: 0.2em 0 0;
+        opacity: 0.6;
+      }
+      .sr-only {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        opacity: 0;
+      }
+      .intro {
+        font-style: ;
+      }
+      .intro sup {
+        color: red;
+        font-size: 1.2em;
+        vertical-align: unset;
+        margin-top: -1em;
+        display: inline-block;
       }
     </style>
   </head>
   <body>
     <h1 id="pg-title">Basic form with web components</h1>
+
+    <p class="sr-only">This form contains required fields.</p>
+    <p class="intro" aria-hidden="true">Required fields indicated with a <sup>*</sup></p>
 
     <form id="simple-form" name="simple-form" action="form.html">
       <simple-input label="Name" required></simple-input>
@@ -73,19 +103,24 @@
 
       <h2>Submit button tests:</h2>
 
-      <p>Validates client-side:</p>
+      <p>Fires <code>submit</code>, then browser runs validation:</p>
+      <ul>
+        <li>if it fails, submission stops</li>
+        <li>if it passes, a <code>FormData</code> obj is created and <code>formdata</code> event fires</li>
+      </ul>
+
       <div class="inline-buttons">
         <button class="button" id="submitDefault" type="submit">
-          HTML submit button
+          HTML built-in submit
         </button>
-        
+
         <div class="button" role="button" tabindex="0" id="requestFn">
           <span>Calls <code>requestSubmit()</code></span>
           <span class="fineprint">Except in Safari &le;15</span>
         </div>
       </div>
 
-      <p>Doesn't fire submit, just sends data:</p>
+      <p>Doesn't fire submit or validate, just fires <code>formdata</code>:</p>
       <div class="button" role="button" tabindex="0" id="submitFn">
         <span>Calls <code>submit()</code></span>
       </div>
@@ -97,44 +132,44 @@
     <script src="components/wc-input.js"></script>
     <script src="components/wc-select.js"></script>
     <script>
-      const simpleForm = document.getElementById("simple-form");
-      const submitBtn = document.getElementById("submitDefault");
-      const fauxSubmitBtn = document.getElementById("submitFn");
-      const requestBtn = document.getElementById("requestFn");
-      const feedback = document.getElementById("feedback");
+      const simpleForm = document.getElementById('simple-form');
+      const submitBtn = document.getElementById('submitDefault');
+      const fauxSubmitBtn = document.getElementById('submitFn');
+      const requestBtn = document.getElementById('requestFn');
+      const feedback = document.getElementById('feedback');
 
       // Bind submit & requestSubmit events for tests
-      fauxSubmitBtn.addEventListener("click", (e) => {
+      fauxSubmitBtn.addEventListener('click', (e) => {
         simpleForm.submit();
       });
-      requestBtn.addEventListener("click", (e) => {
+      requestBtn.addEventListener('click', (e) => {
         simpleForm.requestSubmit();
       });
 
       // Validate fields & create FormData object
-      simpleForm.addEventListener("submit", (e) => {
-        alert("submit fired");
+      simpleForm.addEventListener('submit', (e) => {
+        alert('submit fired');
 
         // pause to allow validation
         e.preventDefault();
 
-        let invalidFields = simpleForm.querySelectorAll("[invalid]");
+        let invalidFields = simpleForm.querySelectorAll('[invalid]');
 
         if (invalidFields.length > 0) {
           invalidFields.forEach((field) => {
             // apply styles
             field.isInvalid();
-          })
+          });
           // focus the first invalid field
           invalidFields[0].focus();
         } else {
           // if no invalid fields, create FormData obj
           this.simpleData = new FormData(simpleForm);
 
-          let fields = simpleForm.querySelectorAll(".field");
+          let fields = simpleForm.querySelectorAll('.field');
           fields.forEach((field) => {
-            let name = field.getAttribute("label");
-            let val = field.getAttribute("value");
+            let name = field.getAttribute('label');
+            let val = field.getAttribute('value');
             this.simpleData.set(name, val);
           });
 
@@ -143,13 +178,14 @@
           for (let [name, value] of this.simpleData) {
             feedbackArr.push(`${name}: ${value}`);
           }
-          feedback.innerHTML = `<h3>Form values:</h3>` + feedbackArr.join(", ");
+          feedback.innerHTML = `<h3>Form values:</h3>` + feedbackArr.join(', ');
         }
       });
 
-      simpleForm.addEventListener("formdata", () => {
-        alert("formdata fired");
-      })
+      simpleForm.addEventListener('formdata', (e) => {
+        alert('formdata fired');
+        e.preventDefault();
+      });
     </script>
   </body>
 </html>
