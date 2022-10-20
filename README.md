@@ -1,2 +1,3 @@
+:warning: This project is archived and the repository is no longer maintained. 
+
 # web-component-form
-Demo code that accompanies the to-be-named blog post.
